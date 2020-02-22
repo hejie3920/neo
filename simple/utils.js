@@ -157,6 +157,16 @@ let utils = {
   }
 }
 
+// 正则
+// let reg = /(\/\.*[\w]+)|(\/\.\.+)/g
+// let str = "///a/./b///../../c/"
+// console.log("TCL: test", reg.test(str))
+// console.log("TCL:match ", str.match(reg))
+// let arr = []
+// while ((arr = reg.exec(str))) {
+//   console.log("TCL:exex ", arr[0])
+// }
+
 /*
 this指向问题
 
