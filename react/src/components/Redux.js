@@ -19,6 +19,7 @@ class Redux extends Component {
   render() {
     return (
       <div>
+        <h2>redux</h2>
         {/* {this.props.list.map((item, index) => (
           <div key={index}>{item}</div>
         ))} */}

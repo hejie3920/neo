@@ -17,7 +17,7 @@
 
 // 获取类型
 // let arr = [2, 4, 8, 9, 34, 2, 76, 34, 12, 4, 56, 7, 23, 12]
-// console.log("TCL: ", utils.getType(obj))
+// console.log("TCL: ", utils.getType(arr))
 
 // 节流
 // window.onresize = utils.debounce(val => {
