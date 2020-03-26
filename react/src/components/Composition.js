@@ -1,5 +1,6 @@
 import React, { Component } from "react"
 function C1(props) {
+  console.log("props", props)
   return <div>{props.children("参数")}</div>
 }
 function C2(props) {

@@ -51,7 +51,6 @@ class StateCop extends Component {
       console.log("TCL: ", this.state.counter) // 结果300
     })
   }
-
   onClickToSetA = () => {
     setTimeout(() => {
       this.setState(

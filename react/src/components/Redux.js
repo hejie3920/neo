@@ -9,6 +9,7 @@ const mapDispatchToProps = {
   addUser,
   asyncFetch
 }
+
 @connect(mapStateToProps, mapDispatchToProps)
 class Redux extends Component {
   componentDidMount() {
@@ -20,9 +21,7 @@ class Redux extends Component {
     return (
       <div>
         <h2>redux</h2>
-        {/* {this.props.list.map((item, index) => (
-          <div key={index}>{item}</div>
-        ))} */}
+        <p>{this.props.list.name}</p>
       </div>
     )
   }

@@ -7,18 +7,18 @@ export const addUser = payload => ({
   payload
 })
 
-export let asyncFetch = payload => ({
-  type: "asyncFetch",
-  payload
-})
+// export let asyncFetch = payload => ({
+//   type: "asyncFetch",
+//   payload
+// })
 
-// export const asyncFetch = payload => {
-//   return dispatch => {
-//     setTimeout(() => {
-//       dispatch({ type: "init", payload })
-//     }, 1000)
-//   }
-// }
+export const asyncFetch = payload => {
+  return dispatch => {
+    setTimeout(() => {
+      dispatch({ type: "init", payload })
+    }, 1000)
+  }
+}
 
 export default function Reducer(
   state = {
@@ -29,7 +29,7 @@ export default function Reducer(
 ) {
   switch (action.type) {
     case "init":
-      return action.type
+      return { ...action.payload }
     case "add":
       return { ...state, ...action.payload }
     default:

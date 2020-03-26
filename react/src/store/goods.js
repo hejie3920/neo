@@ -6,12 +6,11 @@ export const add = payload => ({
   type: "add",
   payload
 })
-
 export const asyncFetch = payload => {
   return dispatch => {
     setTimeout(() => {
-      dispatch({ type: "init", payload })
-    }, 1000)
+      dispatch({ type: "add", payload })
+    }, 200)
   }
 }
 

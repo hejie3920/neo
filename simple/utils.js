@@ -1,19 +1,24 @@
 let utils = {
   // 深拷贝
   deepClone(obj) {
-    let res = {}
-    /*your code ...*/
-    for (let i in obj) {
-      if (typeof obj[i] === "object") {
-        res[i] = isArray(obj[i]) ? [] : {}
-        deepClone(obj[i], res[i])
-      }
-      if (obj.hasOwnProperty(i)) {
-        res[i] = obj[i]
-      }
+    if (obj === null) return null //null 的情况
+    if (obj instanceof RegExp) return new RegExp(obj) //正则表达式的情况
+    if (obj instanceof Date) return new Date(obj) //日期对象的情况
+    if (typeof obj == "function") return new (function(obj) {})() //函数的情况
+    if (typeof obj != "object") {
+      //非复杂类型,直接返回 也是结束递归的条件
+      return obj
     }
-    return res
+    //[].__proto__.constructor=Array()
+    //{}.__proto__.constructor=Object()
+    //因此处理数组的情况时,可以取巧用这个办法来new新对象
+    var newObj = new obj.__proto__.constructor()
+    for (var key in obj) {
+      newObj[key] = deepClone(obj[key])
+    }
+    return newObj
   },
+
   // 正则解码
   decode() {
     let sindex = (eindex = -1)
@@ -44,8 +49,12 @@ let utils = {
     }
     return str
   },
-  // 找数组中最接近指定值得值
+  // 找数组中最接近指定值得值，找最近
+  // 找最接近目标的值，找最近
+  // 直接将目标插入数组，排序，然后indexOf()找到目标值，然后比较左右两个谁最近就好了
   findNearest(arr, target) {
+    // 这一步是深拷贝，目的是为了不影响原数组
+    // let arr = JSON.parse(JSON.stringify(tmp))
     arr.push(target)
     let index = arr.sort((a, b) => a - b).indexOf(target)
     let res
@@ -54,11 +63,12 @@ let utils = {
     else {
       res = target - arr[index - 1] > arr[index + 1] - target ? arr[index + 1] : arr[index - 1]
     }
-    console.log("res: ", res)
+    return res
   },
+
   // 判断类型，获取类型
   getType(val) {
-    return {}.toString
+    return Object.prototype.toString
       .call(val)
       .slice(8, -1)
       .toLowerCase()
@@ -74,39 +84,25 @@ let utils = {
     const ret = fn.apply(obj, args)
     return ret instanceof Object ? ret : obj
   },
-  // 节流
-  throttle2(fn, interval) {
-    let firstTime = true,
-      timer,
-      _fn = fn
+  // 节流教科书
+  throttle(fn, interval) {
+    let timer, // 定时器
+      firstTime = true // 是否是第一次调用
     return function() {
       let _this = this
       if (firstTime) {
-        _fn.apply(_this, arguments)
+        // 如果是第一次调用，不需延迟执行
+        fn.apply(_this, arguments)
         return (firstTime = false)
       }
       if (timer) {
         return false
       }
-      timer = setTimeout(() => {
-        _fn.apply(_this, arguments)
+      timer = setTimeout(function() {
         clearTimeout(timer)
         timer = null
+        fn.apply(_this, arguments)
       }, interval || 500)
-    }
-  },
-  // 节流
-  throttle(fn) {
-    let canRun = true // 通过闭包保存一个标记
-    return function() {
-      if (!canRun) return // 在函数开头判断标记是否为true，不为true则return
-      canRun = false // 立即设置为false
-      setTimeout(() => {
-        // 将外部传入的函数的执行放在setTimeout中
-        fn.apply(this, arguments)
-        // 最后在setTimeout执行完毕后再把标记设置为true(关键)表示可以执行下一次循环了。当定时器没有执行的时候标记永远是false，在开头被return掉
-        canRun = true
-      }, 500)
     }
   },
   // 分时函数,把1秒渲染1000个分成每200毫秒渲染8个
@@ -128,15 +124,30 @@ let utils = {
       }, 200)
     }
   },
+  // 节流
+  throttle(func, wait = 50) {
+    // 上一次执行该函数的时间
+    let lastTime = 0
+    return (...args) => {
+      // 当前时间
+      let now = +new Date()
+      // 将当前时间和上一次执行函数时间对比 // 如果差值大于设置的等待时间就执行函数
+      if (now - lastTime > wait) {
+        lastTime = now
+        func.apply(this, args)
+      }
+    }
+  },
   // 防抖
-  debounce(fn, delay = 20) {
-    let timer = null // 创建一个标记用来存放定时器的返回值
-    return function() {
-      if (timer) clearTimeout(timer) // 每当用户输入的时候把前一个 setTimeout clear 掉
+  debounce(func, wait = 50) {
+    // 缓存一个定时器id
+    let timer = 0
+    // 这里返回的函数是每次用户实际调用的防抖函数 // 如果已经设定过定时器了就清空上一次的定时器 // 开始一个新的定时器，延迟执行用户传入的方法
+    return (...args) => {
+      if (timer) clearTimeout(timer)
       timer = setTimeout(() => {
-        // 然后又创建一个新的 setTimeout, 这样就能保证输入字符后的 interval 间隔内如果还有字符输入的话，就不会执行 fn 函数
-        fn.apply(this, arguments)
-      }, delay)
+        func.apply(this, args)
+      }, wait)
     }
   }
 }
@@ -633,9 +644,6 @@ this指向问题
 // var arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 23, 44, 86]
 // var result = binary_search(arr, 0, 13, 10)
 // alert(result) // 9 返回目标元素的索引值
-
-// 找最接近目标的值
-// 直接将目标插入数组，排序，然后indexOf()找到目标值，然后比较左右两个谁最近就好了
 
 // 二分补齐
 // function leftPad(str, length, ch) {
